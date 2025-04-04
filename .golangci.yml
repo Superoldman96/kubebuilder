@@ -17,11 +17,13 @@ issues:
         - gosec
 
 linters-settings:
+  ginkgolinter:
+    forbid-focus-container: true
+    forbid-spec-pollution: true
   govet:
     enable-all: true
     disable:
       - fieldalignment
-      - shadow
   nolintlint:
     allow-unused: false
   revive:
@@ -41,6 +43,7 @@ linters-settings:
       - name: error-naming
       - name: exported
       - name: if-return
+      - name: import-shadowing
       - name: increment-decrement
       - name: var-naming
       - name: var-declaration
@@ -63,10 +66,11 @@ linters-settings:
       - name: bool-literal-in-expr
       - name: constant-logical-expr
       - name: comment-spacings
-
 linters:
   disable-all: true
   enable:
+    - asciicheck
+    - bidichk
     - dupl
     - errcheck
     - copyloopvar
@@ -74,6 +78,7 @@ linters:
     - goconst
     - gocyclo
     - gofmt
+    - gofumpt
     - goimports
     - gosimple
     - govet
@@ -89,4 +94,5 @@ linters:
     - unconvert
     - unparam
     - unused
+    - whitespace
 

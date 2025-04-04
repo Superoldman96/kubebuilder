@@ -69,8 +69,11 @@ func loadConfig(configPath string) ([]templates.CustomMetricItem, error) {
 	}
 
 	items, err := configReader(f)
+	if err != nil {
+		return nil, fmt.Errorf("error reading config.yaml: %w", err)
+	}
 
-	if err := f.Close(); err != nil {
+	if err = f.Close(); err != nil {
 		return nil, fmt.Errorf("could not close config.yaml: %w", err)
 	}
 
@@ -97,7 +100,7 @@ func configReader(reader io.Reader) ([]templates.CustomMetricItem, error) {
 
 func validateCustomMetricItems(rawItems []templates.CustomMetricItem) []templates.CustomMetricItem {
 	// 1. Filter items of missing `Metric` or `Type`
-	filterResult := []templates.CustomMetricItem{}
+	var filterResult []templates.CustomMetricItem
 	for _, item := range rawItems {
 		if hasFields(item) {
 			filterResult = append(filterResult, item)
@@ -167,9 +170,9 @@ func (s *editScaffolder) Scaffold() error {
 	// Initialize the machinery.Scaffold that will write the files to disk
 	scaffold := machinery.NewScaffold(s.fs)
 
-	configPath := string(configFilePath)
+	configPath := configFilePath
 
-	var templatesBuilder = []machinery.Builder{
+	templatesBuilder := []machinery.Builder{
 		&templates.RuntimeManifest{},
 		&templates.ResourcesManifest{},
 		&templates.CustomMetricsConfigManifest{ConfigPath: configPath},
