@@ -128,6 +128,7 @@ func (c *CLI) applySubcommandHooks(
 		errorMessage:   errorMessage,
 		projectVersion: c.projectVersion,
 		pluginChain:    pluginChain,
+		cliVersion:     c.cliVersion,
 	}
 	cmd.PreRunE = factory.preRunEFunc(options, createConfig)
 	cmd.RunE = factory.runEFunc()
@@ -189,6 +190,8 @@ type executionHooksFactory struct {
 	projectVersion config.Version
 	// pluginChain is the plugin chain configured for this project.
 	pluginChain []string
+	// cliVersion is the version of the CLI.
+	cliVersion string
 }
 
 func (factory *executionHooksFactory) forEach(cb func(subcommand plugin.Subcommand) error, errorMessage string) error {
@@ -243,6 +246,11 @@ func (factory *executionHooksFactory) preRunEFunc(
 			}
 		}
 		cfg := factory.store.Config()
+
+		// Set the CLI version if creating a new project configuration.
+		if createConfig {
+			_ = cfg.SetCliVersion(factory.cliVersion)
+		}
 
 		// Set the pluginChain field.
 		if len(factory.pluginChain) != 0 {
@@ -366,7 +374,7 @@ func updateProjectFileForAlphaGenerate() error {
 
 	// Only update the file if changes were made
 	if updated {
-		err = os.WriteFile(projectFilePath, []byte(projectStr), 0644)
+		err = os.WriteFile(projectFilePath, []byte(projectStr), 0o644)
 		if err != nil {
 			return fmt.Errorf("failed to update PROJECT file: %w", err)
 		}
